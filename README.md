@@ -2,7 +2,7 @@
 
 **Version:** 1.1.6
 
-[![Build Status](https://dev.azure.com/osieng/engineering/_apis/build/status/product-readiness/OCS/OMF_Ing_DotNet?branchName=master)](https://dev.azure.com/osieng/engineering/_build/latest?definitionId=886&branchName=master)
+[![Build Status](https://dev.azure.com/osieng/engineering/_apis/build/status/product-readiness/OCS/osisoft.sample-ocs-omf_ingress-dotnet?repoName=osisoft%2Fsample-ocs-omf_ingress-dotnet&branchName=master)](https://dev.azure.com/osieng/engineering/_build/latest?definitionId=2620&repoName=osisoft%2Fsample-ocs-omf_ingress-dotnet&branchName=master)
 
 ## Scope of Sample
 
