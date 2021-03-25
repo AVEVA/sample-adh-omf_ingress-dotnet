@@ -2,7 +2,7 @@
 
 **Version:** 1.1.7
 
-[![Build Status](https://dev.azure.com/osieng/engineering/_apis/build/status/product-readiness/OCS/osisoft.sample-ocs-omf_ingress-dotnet?repoName=osisoft%2Fsample-ocs-omf_ingress-dotnet&branchName=master)](https://dev.azure.com/osieng/engineering/_build/latest?definitionId=2620&repoName=osisoft%2Fsample-ocs-omf_ingress-dotnet&branchName=master)
+[![Build Status](https://dev.azure.com/osieng/engineering/_apis/build/status/product-readiness/OCS/osisoft.sample-ocs-omf_ingress-dotnet?repoName=osisoft%2Fsample-ocs-omf_ingress-dotnet&branchName=main)](https://dev.azure.com/osieng/engineering/_build/latest?definitionId=2620&repoName=osisoft%2Fsample-ocs-omf_ingress-dotnet&branchName=main)
 
 ## Scope of Sample
 
@@ -193,4 +193,4 @@ dotnet test
 ---
 
 For the main OCS page [ReadMe](https://github.com/osisoft/OSI-Samples-OCS)  
-For the main samples page on master [ReadMe](https://github.com/osisoft/OSI-Samples)
+For the main samples page [ReadMe](https://github.com/osisoft/OSI-Samples)
