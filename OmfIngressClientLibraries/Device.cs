@@ -16,7 +16,7 @@ namespace OmfIngressClientLibraries
             // Create the AuthenticationHandler and IngressSerice to use to send data
             AuthenticationHandler deviceAuthenticationHandler = new AuthenticationHandler(new Uri(address), clientId, clientSecret);
 
-            OmfIngressService deviceBaseOmfIngressService = new OmfIngressService(new Uri(address), null, HttpCompressionMethod.None, deviceAuthenticationHandler);
+            OmfIngressService deviceBaseOmfIngressService = new OmfIngressService(new Uri(address), HttpCompressionMethod.None, deviceAuthenticationHandler);
             _deviceOmfIngressService = deviceBaseOmfIngressService.GetOmfIngressService(tenantId, namespaceId);
         }
 

@@ -61,7 +61,7 @@ The following code block illustrates how to configure the OmfIngressService to u
 ```C#
 AuthenticationHandler authenticationHandler = new AuthenticationHandler(address, clientId, clientSecret);
 
-OmfIngressService baseOmfIngressService = new OmfIngressService(new Uri(address), null, HttpCompressionMethod.None, authenticationHandler);
+OmfIngressService baseOmfIngressService = new OmfIngressService(new Uri(address), HttpCompressionMethod.None, authenticationHandler);
 IOmfIngressService omfIngressService = baseOmfIngressService.GetOmfIngressService(tenantId, namespaceId);
 ```
 

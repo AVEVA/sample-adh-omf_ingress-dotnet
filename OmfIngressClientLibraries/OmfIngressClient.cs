@@ -20,7 +20,7 @@ namespace OmfIngressClientLibraries
             AuthenticationHandler authenticationHandler = new AuthenticationHandler(new Uri(address), clientId, clientSecret);
             _tenantId = tenantId;
             _namespaceId = namespaceId;
-            OmfIngressService baseOmfIngressService = new OmfIngressService(new Uri(address), null, HttpCompressionMethod.None, authenticationHandler);
+            OmfIngressService baseOmfIngressService = new OmfIngressService(new Uri(address), HttpCompressionMethod.None, authenticationHandler);
             _omfIngressService = baseOmfIngressService.GetOmfIngressService(tenantId, namespaceId);
         }
 
