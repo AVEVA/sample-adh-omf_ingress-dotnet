@@ -1,6 +1,6 @@
 # OMF Ingress .NET Samples
 
-**Version:** 1.1.10
+**Version:** 1.1.11
 
 [![Build Status](https://dev.azure.com/osieng/engineering/_apis/build/status/product-readiness/OCS/osisoft.sample-ocs-omf_ingress-dotnet?repoName=osisoft%2Fsample-ocs-omf_ingress-dotnet&branchName=main)](https://dev.azure.com/osieng/engineering/_build/latest?definitionId=2620&repoName=osisoft%2Fsample-ocs-omf_ingress-dotnet&branchName=main)
 
@@ -61,7 +61,7 @@ The following code block illustrates how to configure the OmfIngressService to u
 ```C#
 AuthenticationHandler authenticationHandler = new AuthenticationHandler(address, clientId, clientSecret);
 
-OmfIngressService baseOmfIngressService = new OmfIngressService(new Uri(address), null, HttpCompressionMethod.None, authenticationHandler);
+OmfIngressService baseOmfIngressService = new OmfIngressService(new Uri(address), HttpCompressionMethod.None, authenticationHandler);
 IOmfIngressService omfIngressService = baseOmfIngressService.GetOmfIngressService(tenantId, namespaceId);
 ```
 
