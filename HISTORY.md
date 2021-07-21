@@ -1,5 +1,9 @@
 # Version History
 
+## 1.1.12 / 2021-07-20
+
+- Cleaned up gitignore
+
 ## 1.1.11 / 2021-07-08
 
 - Updated dependencies, OSIsoft.OMFIngress removed ISDS Parameter
