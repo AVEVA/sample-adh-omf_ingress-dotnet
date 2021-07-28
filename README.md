@@ -1,6 +1,6 @@
 # OMF Ingress .NET Samples
 
-**Version:** 1.1.12
+**Version:** 1.1.13
 
 [![Build Status](https://dev.azure.com/osieng/engineering/_apis/build/status/product-readiness/OCS/osisoft.sample-ocs-omf_ingress-dotnet?repoName=osisoft%2Fsample-ocs-omf_ingress-dotnet&branchName=main)](https://dev.azure.com/osieng/engineering/_build/latest?definitionId=2620&repoName=osisoft%2Fsample-ocs-omf_ingress-dotnet&branchName=main)
 
