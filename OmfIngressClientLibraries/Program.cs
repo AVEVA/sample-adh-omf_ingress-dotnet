@@ -97,7 +97,7 @@ namespace OmfIngressClientLibraries
             // Get Ingress Services to communicate with server and handle ingress management
             _omfIngressClient = new OmfIngressClient(Address, TenantId, NamespaceId, ClientId, ClientSecret);
 
-            Console.WriteLine($"OCS endpoint at {Address}");
+            Console.WriteLine($"ADH endpoint at {Address}");
             Console.WriteLine();            
         }
 

@@ -1,16 +1,19 @@
 # OMF Ingress .NET Samples
 
+| :loudspeaker: **Notice**: Samples have been updated to reflect that they work on AVEVA Data Hub. The samples also work on OSIsoft Cloud Services unless otherwise noted. |
+| -----------------------------------------------------------------------------------------------|  
+
 **Version:** 1.1.18
 
 [![Build Status](https://dev.azure.com/osieng/engineering/_apis/build/status/product-readiness/OCS/osisoft.sample-ocs-omf_ingress-dotnet?repoName=osisoft%2Fsample-ocs-omf_ingress-dotnet&branchName=main)](https://dev.azure.com/osieng/engineering/_build/latest?definitionId=2620&repoName=osisoft%2Fsample-ocs-omf_ingress-dotnet&branchName=main)
 
 ## Scope of Sample
 
-This sample is intended to show how to build out the OMF Ingress connection in OCS programmatically using the DotNet NuGet library. The starting point of this sample assumes your OMF Ingress is not configured. It does show sending OMF data, but that is to show that the programmatic OMF configuration works. A typical OMF app would assume that the OMF ingress is already configured (as this is a one time configuration action). To learn about OMF application development and see samples of typcial OMF applications please go to our [OMF Repository](https://github.com/osisoft/OSI-Samples-OMF).
+This sample is intended to show how to build out the OMF Ingress connection in ADH programmatically using the DotNet NuGet library. The starting point of this sample assumes your OMF Ingress is not configured. It does show sending OMF data, but that is to show that the programmatic OMF configuration works. A typical OMF app would assume that the OMF ingress is already configured (as this is a one time configuration action). To learn about OMF application development and see samples of typcial OMF applications please go to our [OMF Repository](https://github.com/osisoft/OSI-Samples-OMF).
 
 ## Building a Client with the Ingress Client Libraries
 
-The sample described in this section makes use of the OSIsoft Ingress Client Libraries. When working in .NET, it is recommended that you use these libraries. The libraries are available as NuGet packages. The packages used are:
+The sample described in this section makes use of the AVEVA Ingress Client Libraries. When working in .NET, it is recommended that you use these libraries. The libraries are available as NuGet packages. The packages used are:
 
 - OSIsoft.Omf
 - OSIsoft.OmfIngress
@@ -22,13 +25,13 @@ The libraries offer a framework of classes that make client development easier.
 
 The sample is configured using the file [appsettings.placeholder.json](OmfIngressClientLibraries/appsettings.placeholder.json). Before editing, rename this file to `appsettings.json`. This repository's `.gitignore` rules should prevent the file from ever being checked in to any fork or branch, to ensure credentials are not compromised.
 
-The OMF Ingress Service is secured by obtaining tokens from the Identity Server. Such clients provide a client application identifier and an associated secret (or key) that are authenticated against the server. The sample includes an `appsettings.json` configuration file to hold configuration strings, including the authentication strings. You must replace the placeholders with the authentication-related values you received from OSIsoft. The application requires two Client Credential Clients, one to manage OMF Ingress connections and one to send data from a mock device. For information on how to obtain these client IDs and secrets, see the [Client Credential Client Documentation](https://ocs-docs.osisoft.com/Content_Portal/Documentation/Identity/Identity_ClientCredentialClient.html).
+The OMF Ingress Service is secured by obtaining tokens from the Identity Server. Such clients provide a client application identifier and an associated secret (or key) that are authenticated against the server. The sample includes an `appsettings.json` configuration file to hold configuration strings, including the authentication strings. You must replace the placeholders with the authentication-related values you received from AVEVA. The application requires two Client Credential Clients, one to manage OMF Ingress connections and one to send data from a mock device. For information on how to obtain these client IDs and secrets, see the [Client Credential Client Documentation](https://ocs-docs.osisoft.com/Content_Portal/Documentation/Identity/Identity_ClientCredentialClient.html).
 
 ```json
 {
   "TenantId": "PLACEHOLDER_REPLACE_WITH_TENANT_ID",
   "NamespaceId": "PLACEHOLDER_REPLACE_WITH_NAMESPACE_ID",
-  "Address": "https://dat-b.osisoft.com", //This is the base address, NOT the OMF endpoint.
+  "Address": "https://uswe.datahub.connect.aveva.com", //This is the base address, NOT the OMF endpoint.
   "ClientId": "PLACEHOLDER_REPLACE_WITH_CLIENT_IDENTIFIER", //This is the client to connect to the OMF Ingress Services.
   "ClientSecret": "PLACEHOLDER_REPLACE_WITH_CLIENT_SECRET",
   "DeviceClientId": "PLACEHOLDER_REPLACE_WITH_DEVICE_CLIENT_ID", //This is the client that will be used to send OMF data. Make sure a connection hasn't been made for this client yet.
@@ -88,7 +91,7 @@ Topic topic = new Topic()
 };
 ```
 
-Then use the Ingress client to create the Topic in OCS:
+Then use the Ingress client to create the Topic in ADH:
 
 ```C#
 Topic createdTopic = await omfIngressService.CreateTopicAsync(topic);
@@ -102,14 +105,14 @@ A Subscription is used to consume data from a Topic and relay it to the Sequenti
 Subscription subscription = new Subscription()
 {
     Name = "REPLACE_WITH_SUBSCRIPTION_NAME",
-    Description = "This is a sample OCS Data Store Subscription",
+    Description = "This is a sample ADH Data Store Subscription",
     TopicId = createdTopic.Id,
     TopicTenantId = "REPLACE_WITH_TOPIC_TENANT_ID",
     TopicNamespaceId = "REPLACE_WITH_TOPIC_NAMESPACE_ID"
 };
 ```
 
-Then use the Ingress client to create the Subscription in OCS:
+Then use the Ingress client to create the Subscription in ADH:
 
 ```C#
 Subscription createdSubscription = await omfIngressService.CreateSubscriptionAsync(subscription);
@@ -117,7 +120,7 @@ Subscription createdSubscription = await omfIngressService.CreateSubscriptionAsy
 
 ## Send OMF Messages
 
-OMF messages sent to OCS are translated into objects native to the Sequential Data Store. In this example, we send an OMF Type message which creates an SDS type in the data store, an OMF Container message which creates an SDS stream, and then send OMF Data messages, which use the containerId in the message body to route the data to the SDS stream. Refer to the data store documentation for how to view the types/streams/data in SDS. For each type of message, we first construct the message body using the OMF library:
+OMF messages sent to ADH are translated into objects native to the Sequential Data Store. In this example, we send an OMF Type message which creates an SDS type in the data store, an OMF Container message which creates an SDS stream, and then send OMF Data messages, which use the containerId in the message body to route the data to the SDS stream. Refer to the data store documentation for how to view the types/streams/data in SDS. For each type of message, we first construct the message body using the OMF library:
 
 ```C#
 OmfTypeMessage typeMessage = OmfMessageCreator.CreateTypeMessage(typeof(DataPointType));
@@ -192,5 +195,5 @@ dotnet test
 
 ---
 
-For the main OCS page [ReadMe](https://github.com/osisoft/OSI-Samples-OCS)  
-For the main samples page [ReadMe](https://github.com/osisoft/OSI-Samples)
+For the main ADH page [ReadMe](https://github.com/osisoft/OSI-Samples-OCS)  
+For the main AVEVA samples page [ReadMe](https://github.com/osisoft/OSI-Samples)
