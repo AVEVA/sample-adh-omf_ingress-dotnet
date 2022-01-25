@@ -19,10 +19,10 @@ namespace OmfIngressClientLibrariesTests
             Program.Setup();
 
             // Initializing Sds Service
-            ISdsMetadataService sdsMetadataService = SdsService.GetMetadataService(new Uri(Program.Address), Program.TenantId, Program.NamespaceId,
-                new AuthenticationHandler(new Uri(Program.Address), Program.ClientId, Program.ClientSecret));
-            ISdsDataService sdsDataService = SdsService.GetDataService(new Uri(Program.Address), Program.TenantId, Program.NamespaceId,
-                new AuthenticationHandler(new Uri(Program.Address), Program.ClientId, Program.ClientSecret));
+            ISdsMetadataService sdsMetadataService = SdsService.GetMetadataService(new Uri(Program.Resource), Program.TenantId, Program.NamespaceId,
+                new AuthenticationHandler(new Uri(Program.Resource), Program.ClientId, Program.ClientSecret));
+            ISdsDataService sdsDataService = SdsService.GetDataService(new Uri(Program.Resource), Program.TenantId, Program.NamespaceId,
+                new AuthenticationHandler(new Uri(Program.Resource), Program.ClientId, Program.ClientSecret));
 
             OmfConnection omfConnection = null;
             try

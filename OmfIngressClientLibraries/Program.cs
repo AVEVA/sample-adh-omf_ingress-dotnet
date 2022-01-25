@@ -11,7 +11,7 @@ namespace OmfIngressClientLibraries
         private static Device _omfDevice;
         private static IConfiguration _config;
 
-        public static string Address { get; set; }
+        public static string Resource { get; set; }
         public static string TenantId { get; set; }
         public static string NamespaceId { get; set; }
         public static string ClientId { get; set; }
@@ -84,7 +84,7 @@ namespace OmfIngressClientLibraries
             // ==== Client constants ====
             TenantId = _config["TenantId"];
             NamespaceId = _config["NamespaceId"];
-            Address = _config["Address"];
+            Resource = _config["Resource"];
             ClientId = _config["ClientId"];
             ClientSecret = _config["ClientSecret"];
             ConnectionName = _config["ConnectionName"];
@@ -92,12 +92,12 @@ namespace OmfIngressClientLibraries
             DeviceClientId = _config["DeviceClientId"];
             DeviceClientSecret = _config["DeviceClientSecret"];
 
-            _omfDevice = new Device(Address, TenantId, NamespaceId, DeviceClientId, DeviceClientSecret);
+            _omfDevice = new Device(Resource, TenantId, NamespaceId, DeviceClientId, DeviceClientSecret);
 
             // Get Ingress Services to communicate with server and handle ingress management
-            _omfIngressClient = new OmfIngressClient(Address, TenantId, NamespaceId, ClientId, ClientSecret);
+            _omfIngressClient = new OmfIngressClient(Resource, TenantId, NamespaceId, ClientId, ClientSecret);
 
-            Console.WriteLine($"ADH endpoint at {Address}");
+            Console.WriteLine($"ADH endpoint at {Resource}");
             Console.WriteLine();            
         }
 

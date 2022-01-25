@@ -3,7 +3,7 @@
 | :loudspeaker: **Notice**: Samples have been updated to reflect that they work on AVEVA Data Hub. The samples also work on OSIsoft Cloud Services unless otherwise noted. |
 | -----------------------------------------------------------------------------------------------|  
 
-**Version:** 1.1.18
+**Version:** 1.1.0
 
 [![Build Status](https://dev.azure.com/osieng/engineering/_apis/build/status/product-readiness/ADH/aveva.sample-adh-omf_ingress-dotnet?branchName=main)](https://dev.azure.com/osieng/engineering/_build/latest?definitionId=2620&branchName=main)
 
@@ -31,7 +31,7 @@ The OMF Ingress Service is secured by obtaining tokens from the Identity Server.
 {
   "TenantId": "PLACEHOLDER_REPLACE_WITH_TENANT_ID",
   "NamespaceId": "PLACEHOLDER_REPLACE_WITH_NAMESPACE_ID",
-  "Address": "https://uswe.datahub.connect.aveva.com", //This is the base address, NOT the OMF endpoint.
+  "Resource": "https://uswe.datahub.connect.aveva.com", //This is the base address, NOT the OMF endpoint.
   "ClientId": "PLACEHOLDER_REPLACE_WITH_CLIENT_IDENTIFIER", //This is the client to connect to the OMF Ingress Services.
   "ClientSecret": "PLACEHOLDER_REPLACE_WITH_CLIENT_SECRET",
   "DeviceClientId": "PLACEHOLDER_REPLACE_WITH_DEVICE_CLIENT_ID", //This is the client that will be used to send OMF data. Make sure a connection hasn't been made for this client yet.
