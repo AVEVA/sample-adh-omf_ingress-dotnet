@@ -1,5 +1,13 @@
 # Version History
 
+## 1.1.1 / 2022-02-02
+
+- Updated dependencies
+
+## 1.1.0 / 2022-01-27
+
+- Change Address to Resource
+
 ## 1.0.18 / 2022-01-17
 
 - Updated dependencies
