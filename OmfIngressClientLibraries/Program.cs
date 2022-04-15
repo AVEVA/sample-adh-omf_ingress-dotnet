@@ -115,11 +115,11 @@ namespace OmfIngressClientLibraries
             await _omfDevice.CreateStreamAsync(StreamId).ConfigureAwait(false);
 
             // Send random data points
-            Random rand = new Random();
+            Random rand = new ();
             Console.WriteLine("Sending 5 OMF Data Messages.");
             for (int i = 0; i < 5; i++)
             {
-                DataPointType dataPoint = new DataPointType() { Timestamp = DateTime.UtcNow, Value = rand.NextDouble() };
+                DataPointType dataPoint = new () { Timestamp = DateTime.UtcNow, Value = rand.NextDouble() };
                 await _omfDevice.SendValueAsync(StreamId, dataPoint).ConfigureAwait(false);
                 await Task.Delay(1000).ConfigureAwait(false);
             }

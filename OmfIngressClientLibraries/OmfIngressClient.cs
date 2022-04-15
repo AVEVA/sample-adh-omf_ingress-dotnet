@@ -17,10 +17,10 @@ namespace OmfIngressClientLibraries
         public OmfIngressClient(string address, string tenantId, string namespaceId, string clientId, string clientSecret)
         {
             // Get Ingress Services to communicate with server and handle ingress management
-            AuthenticationHandler authenticationHandler = new AuthenticationHandler(new Uri(address), clientId, clientSecret);
+            AuthenticationHandler authenticationHandler = new (new Uri(address), clientId, clientSecret);
             _tenantId = tenantId;
             _namespaceId = namespaceId;
-            OmfIngressService baseOmfIngressService = new OmfIngressService(new Uri(address), HttpCompressionMethod.None, authenticationHandler);
+            OmfIngressService baseOmfIngressService = new (new Uri(address), HttpCompressionMethod.None, authenticationHandler);
             _omfIngressService = baseOmfIngressService.GetOmfIngressService(tenantId, namespaceId);
         }
 
@@ -29,7 +29,7 @@ namespace OmfIngressClientLibraries
             // Create a Topic
             Console.WriteLine($"Creating a Topic in Namespace {_namespaceId} for Client with Id {deviceClientId}");
             Console.WriteLine();
-            CreateTopic topic = new CreateTopic()
+            CreateTopic topic = new ()
             {
                 Name = connectionName,
                 Description = "This is a sample Topic",
@@ -42,7 +42,7 @@ namespace OmfIngressClientLibraries
             // Create a Subscription
             Console.WriteLine($"Creating a Subscription in Namespace {destinationNamespaceId} for Topic with Id {createdTopic.Id}");
             Console.WriteLine();
-            CreateSubscription subscription = new CreateSubscription()
+            CreateSubscription subscription = new ()
             {
                 Name = $"{connectionName}-{destinationNamespaceId}",
                 Description = "This is a sample Subscription",
@@ -53,7 +53,7 @@ namespace OmfIngressClientLibraries
             Subscription createdSubscription = await _omfIngressService.CreateSubscriptionAsync(subscription).ConfigureAwait(false);
             Console.WriteLine($"Created a Subscription with Id {createdSubscription.Id}");
             Console.WriteLine();
-            OmfConnection omfConnection = new OmfConnection(new List<string> { deviceClientId }, createdTopic, createdSubscription);
+            OmfConnection omfConnection = new (new List<string> { deviceClientId }, createdTopic, createdSubscription);
             return omfConnection;
         }
 
