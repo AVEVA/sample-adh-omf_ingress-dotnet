@@ -3,7 +3,7 @@
 | :loudspeaker: **Notice**: Samples have been updated to reflect that they work on AVEVA Data Hub. The samples also work on OSIsoft Cloud Services unless otherwise noted. |
 | -----------------------------------------------------------------------------------------------|  
 
-**Version:** 1.1.3
+**Version:** 1.2.0
 
 [![Build Status](https://dev.azure.com/osieng/engineering/_apis/build/status/product-readiness/ADH/aveva.sample-adh-omf_ingress-dotnet?branchName=main)](https://dev.azure.com/osieng/engineering/_build/latest?definitionId=2620&branchName=main)
 
@@ -167,7 +167,7 @@ Replace the placeholders in the `appsettings.json` file with your TenantId, Name
 
 ### Requirements
 
-- .NET Core 2.1 or later
+- .NET 6.0 or later
 - Reliable internet connection
 
 ### Using Visual Studio
