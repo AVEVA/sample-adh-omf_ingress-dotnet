@@ -65,7 +65,6 @@ namespace OmfIngressClientLibraries
                 }
 
                 Console.WriteLine("Complete!");
-                Console.ReadKey();
             }
 
             if (toThrow != null)
