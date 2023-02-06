@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using OSIsoft.Data.Http;
@@ -14,6 +15,7 @@ namespace OmfIngressClientLibraries
         private static Device _omfDevice;
         private static IConfiguration _config;
         private static IOmfIngressService _omfIngressService;
+        private static int _timeout = 2 * 60 * 1000;
 
         public static string Resource { get; set; }
         public static string TenantId { get; set; }
@@ -120,10 +122,19 @@ namespace OmfIngressClientLibraries
             omfConnectionCreate.ClientIds.Add(DeviceClientId);
             OmfConnection omfConnection = await _omfIngressService.BeginCreateOmfConnectionAsync(omfConnectionCreate).ConfigureAwait(false);
 
-            while (!omfConnection.State.Equals("Active"))
+            // Check the state of the client until it is Active or 2 minutes have elapsed
+            using (CancellationTokenSource cancel = new CancellationTokenSource(_timeout))
             {
-                omfConnection = await _omfIngressService.GetOmfConnectionAsync(omfConnection.Id).ConfigureAwait(false);
-                Task.Delay(1000).Wait();
+                while (!cancel.IsCancellationRequested && !omfConnection.State.Equals("Active"))
+                {
+                    omfConnection = await _omfIngressService.GetOmfConnectionAsync(omfConnection.Id).ConfigureAwait(false);
+                    Task.Delay(1000).Wait();
+                }
+
+                if (cancel.IsCancellationRequested)
+                {
+                    throw new Exception("Omf Connection creation timeout");
+                }
             }
 
             return omfConnection;
@@ -167,26 +178,35 @@ namespace OmfIngressClientLibraries
 
             await _omfIngressService.BeginDeleteOmfConnectionAsync(omfConnection.Id).ConfigureAwait(false);
 
-            bool deleted = false;
-            while (!deleted)
+            // Query and check the list of omfConnections until the omfConnection is no longer present or has a state of Deleted
+            using (CancellationTokenSource cancel = new CancellationTokenSource(_timeout))
             {
-                OmfConnections omfConnections = await _omfIngressService.GetOmfConnectionsAsync().ConfigureAwait(false);
-                bool found = false;
-                foreach (OmfConnection connection in omfConnections.Results)
+                bool deleted = false;
+                while (!deleted)
                 {
-                    if (string.Equals(connection.Id, omfConnection.Id, StringComparison.InvariantCultureIgnoreCase))
+                    OmfConnections omfConnections = await _omfIngressService.GetOmfConnectionsAsync().ConfigureAwait(false);
+                    bool found = false;
+                    foreach (OmfConnection connection in omfConnections.Results)
                     {
-                        deleted = connection.State.Equals("Deleted");
-                        found = true;
+                        if (string.Equals(connection.Id, omfConnection.Id, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            deleted = connection.State.Equals("Deleted");
+                            found = true;
+                        }
                     }
+
+                    if (!found)
+                    {
+                        deleted = true;
+                    }
+
+                    Task.Delay(1000).Wait();
                 }
 
-                if (!found)
+                if (cancel.IsCancellationRequested)
                 {
-                    deleted = true;
+                    throw new Exception("Omf Connection deletion timeout");
                 }
-
-                Task.Delay(1000).Wait();
             }
         }
     }

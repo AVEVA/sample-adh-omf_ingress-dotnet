@@ -70,7 +70,7 @@ Devices sending OMF messages each need a clientId and clientSecret. The clientId
 
 ## OMF Connections
 
- An OMF Connection is the connection that handles reading and handling OMF messages. We create the Connection locally by instantiating a new OmfConnectionCreate object:
+ An OMF Connection is the connection that handles reading and handling OMF messages. We create the Connection by instantiating a new OmfConnectionCreate object:
 
 ```C#
 OmfConnectionCreate omfConnectionCreate = new OmfConnectionCreate()
@@ -87,15 +87,25 @@ Then use the Ingress client to start the creation of the Client:
 OmfConnection omfConnection = await omfIngressService.BeginCreateOmfConnectionAsync(omfConnectionCreate).ConfigureAwait(false);
 ```
 
-After initiating creation, we can monitor the status of the omfConnection by continuously querying for the connection and checking its status:
+After initiating creation, we can query for the connection and check the status until it is Active:
 
 ```C#
-while (!omfConnection.State.Equals("Active"))
+using (CancellationTokenSource cancel = new CancellationTokenSource(_timeout))
 {
-    omfConnection = await _omfIngressService.GetOmfConnectionAsync(omfConnection.Id).ConfigureAwait(false);
-    Task.Delay(1000).Wait();
+    while (!cancel.IsCancellationRequested && !omfConnection.State.Equals("Active"))
+    {
+        omfConnection = await _omfIngressService.GetOmfConnectionAsync(omfConnection.Id).ConfigureAwait(false);
+        Task.Delay(1000).Wait();
+    }
+
+    if (cancel.IsCancellationRequested)
+    {
+        throw new Exception("Omf Connection creation timeout");
+    }
 }
 ```
+
+A cancellation token is used to ensure that the action never excedes the value _timeout.
 
 ## Send OMF Messages
 
@@ -142,28 +152,38 @@ await _omfIngressService.BeginDeleteOmfConnectionAsync(omfConnection.Id).Configu
 After beginning the deletion, we can continuously check the list of OMF Connections until it no longer contains our omfConnection:
 
 ```C#
-bool deleted = false;
-while (!deleted)
+using (CancellationTokenSource cancel = new CancellationTokenSource(_timeout))
 {
-    OmfConnections omfConnections = await _omfIngressService.GetOmfConnectionsAsync().ConfigureAwait(false);
-    bool found = false;
-    foreach (OmfConnection connection in omfConnections.Results)
+    bool deleted = false;
+    while (!deleted)
     {
-        if (string.Equals(connection.Id, omfConnection.Id, StringComparison.InvariantCultureIgnoreCase))
+        OmfConnections omfConnections = await _omfIngressService.GetOmfConnectionsAsync().ConfigureAwait(false);
+        bool found = false;
+        foreach (OmfConnection connection in omfConnections.Results)
         {
-            deleted = connection.State.Equals("Deleted");
-            found = true;
+            if (string.Equals(connection.Id, omfConnection.Id, StringComparison.InvariantCultureIgnoreCase))
+            {
+                deleted = connection.State.Equals("Deleted");
+                found = true;
+            }
         }
+
+        if (!found)
+        {
+            deleted = true;
+        }
+
+        Task.Delay(1000).Wait();
     }
 
-    if (!found)
+    if (cancel.IsCancellationRequested)
     {
-        deleted = true;
+        throw new Exception("Omf Connection deletion timeout");
     }
-
-    Task.Delay(1000).Wait();
 }
 ```
+
+A cancellation token is used to ensure that the action never excedes the value _timeout.
 
 ## Steps to run this sample
 
