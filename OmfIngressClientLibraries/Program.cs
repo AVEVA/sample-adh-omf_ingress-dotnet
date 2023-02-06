@@ -2,14 +2,18 @@
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using OSIsoft.Data.Http;
+using OSIsoft.Identity;
+using OSIsoft.OmfIngress;
+using OSIsoft.OmfIngress.Models;
 
 namespace OmfIngressClientLibraries
 {
     public static class Program
     {
-        private static OmfIngressClient _omfIngressClient;
         private static Device _omfDevice;
         private static IConfiguration _config;
+        private static IOmfIngressService _omfIngressService;
 
         public static string Resource { get; set; }
         public static string TenantId { get; set; }
@@ -90,11 +94,13 @@ namespace OmfIngressClientLibraries
             StreamId = _config["StreamId"];
             DeviceClientId = _config["DeviceClientId"];
             DeviceClientSecret = _config["DeviceClientSecret"];
-
+               
             _omfDevice = new Device(Resource, TenantId, NamespaceId, DeviceClientId, DeviceClientSecret);
 
             // Get Ingress Services to communicate with server and handle ingress management
-            _omfIngressClient = new OmfIngressClient(Resource, TenantId, NamespaceId, ClientId, ClientSecret);
+            AuthenticationHandler authenticationHandler = new (new Uri(Resource), ClientId, ClientSecret);
+            OmfIngressService baseOmfIngressService = new (new Uri(Resource), HttpCompressionMethod.None, authenticationHandler);
+            _omfIngressService = baseOmfIngressService.GetOmfIngressService(TenantId, NamespaceId);
 
             Console.WriteLine($"ADH endpoint at {Resource}");
             Console.WriteLine();            
@@ -103,7 +109,23 @@ namespace OmfIngressClientLibraries
         public static async Task<OmfConnection> CreateOmfConnectionAsync()
         {
             // Create the Connection
-            OmfConnection omfConnection = await _omfIngressClient.CreateOmfConnectionAsync(DeviceClientId, ConnectionName, NamespaceId).ConfigureAwait(false);
+            // Begin creation of OmfConnection
+            Console.WriteLine($"Creating an OMF Connection in Namespace {NamespaceId} for Client with Id {DeviceClientId}");
+            Console.WriteLine();
+            OmfConnectionCreate omfConnectionCreate = new ()
+            {
+                Name = ConnectionName,
+                Description = "This is a sample Connection",
+            };
+            omfConnectionCreate.ClientIds.Add(DeviceClientId);
+            OmfConnection omfConnection = await _omfIngressService.BeginCreateOmfConnectionAsync(omfConnectionCreate).ConfigureAwait(false);
+
+            while (!omfConnection.State.Equals("Active"))
+            {
+                omfConnection = await _omfIngressService.GetOmfConnectionAsync(omfConnection.Id).ConfigureAwait(false);
+                Task.Delay(1000).Wait();
+            }
+
             return omfConnection;
         }
 
@@ -134,7 +156,38 @@ namespace OmfIngressClientLibraries
         public static async Task DeleteOmfConnectionAsync(OmfConnection omfConnection)
         {
             // Delete the Connection           
-            await _omfIngressClient.DeleteOmfConnectionAsync(omfConnection).ConfigureAwait(false);
+            if (omfConnection == null)
+            {
+                throw new ArgumentException("Omf Connection cannot be null", nameof(omfConnection));
+            }
+
+            // Delete the Connection
+            Console.WriteLine($"Deleting the OMF Connection with Id {omfConnection.Id}");
+            Console.WriteLine();
+
+            await _omfIngressService.BeginDeleteOmfConnectionAsync(omfConnection.Id).ConfigureAwait(false);
+
+            bool deleted = false;
+            while (!deleted)
+            {
+                OmfConnections omfConnections = await _omfIngressService.GetOmfConnectionsAsync().ConfigureAwait(false);
+                bool found = false;
+                foreach (OmfConnection connection in omfConnections.Results)
+                {
+                    if (string.Equals(connection.Id, omfConnection.Id, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        deleted = connection.State.Equals("Deleted");
+                        found = true;
+                    }
+                }
+
+                if (!found)
+                {
+                    deleted = true;
+                }
+
+                Task.Delay(1000).Wait();
+            }
         }
     }
 }
