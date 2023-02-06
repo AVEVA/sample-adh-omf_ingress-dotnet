@@ -94,7 +94,7 @@ namespace OmfIngressClientLibraries
             StreamId = _config["StreamId"];
             DeviceClientId = _config["DeviceClientId"];
             DeviceClientSecret = _config["DeviceClientSecret"];
-               
+
             _omfDevice = new Device(Resource, TenantId, NamespaceId, DeviceClientId, DeviceClientSecret);
 
             // Get Ingress Services to communicate with server and handle ingress management
