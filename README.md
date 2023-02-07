@@ -120,7 +120,7 @@ DataPointType dataPoint = new DataPointType() { Timestamp = DateTime.UtcNow, Val
 OmfDataMessage dataMessage = OmfMessageCreator.CreateDataMessage(streamId, dataPoint);
 ```
 
-Then the devices uses its own ingress client, which uses the device clientId and clientSecret to authenticate the requests. The device clientId is used to route the message to the Connection that the clientId is mapped to. Note that the message must be serialized before being sent.
+Then the devices uses its own ingress client, which uses the device clientId and clientSecret to authenticate the requests. The device clientId is used to route the message to the Connection that the clientId is mapped to.
 
 ```C#
 var serializedMessage = OmfMessageSerializer.Serialize(omfMessage);
