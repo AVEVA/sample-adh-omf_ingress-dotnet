@@ -6,6 +6,7 @@ using OmfIngressClientLibraries;
 using OSIsoft.Data;
 using OSIsoft.Data.Http;
 using OSIsoft.Identity;
+using OSIsoft.OmfIngress.Models;
 using Xunit;
 
 namespace OmfIngressClientLibrariesTests

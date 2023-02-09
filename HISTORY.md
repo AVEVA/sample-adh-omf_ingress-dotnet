@@ -1,5 +1,10 @@
 # Version History
 
+## 1.2.4 / 2023-02-06
+
+- Update OmfIngressClient to use new Connections
+- Remove depricated Topics and Subscriptions
+
 ## 1.2.3 / 2022-08-17
 
 - Automate dependabot approval and automerge

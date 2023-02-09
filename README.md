@@ -3,7 +3,7 @@
 | :loudspeaker: **Notice**: Samples have been updated to reflect that they work on AVEVA Data Hub. The samples also work on OSIsoft Cloud Services unless otherwise noted. |
 | -----------------------------------------------------------------------------------------------|  
 
-**Version:** 1.2.3
+**Version:** 1.2.4
 
 [![Build Status](https://dev.azure.com/osieng/engineering/_apis/build/status/product-readiness/ADH/aveva.sample-adh-omf_ingress-dotnet?branchName=main)](https://dev.azure.com/osieng/engineering/_build/latest?definitionId=2620&branchName=main)
 
@@ -43,15 +43,9 @@ The OMF Ingress Service is secured by obtaining tokens from the Identity Server.
 
 The authentication values are provided to the `OSIsoft.Identity.AuthenticationHandler`. The AuthenticationHandler is a DelegatingHandler that is attached to an HttpClient pipeline.
 
-Please note that while running the samples, you might get the following error:
-
-`The specified client is already mapped to a different topic in the given namespace.`
-
-If you get this error, it means that your DeviceClientId is already mapped to a topic in the same namespace. In that case, either create a new client and update the credentials for DeviceClientId and DeviceClientSecret, or specify a different namespace.
-
 ## Other Configuration
 
-The aforementioned `appsettings.json` file has placeholders for the names of the connection, as well as a client Id to map a device to the topic. You must fill in those values as well.
+The aforementioned `appsettings.json` file has placeholders for the names of the connection, as well as a client Id to map a device to the connection. You must fill in those values as well.
 
 ## Set up OmfIngressService
 
@@ -70,53 +64,48 @@ IOmfIngressService omfIngressService = baseOmfIngressService.GetOmfIngressServic
 
 Note that the instance of the IOmfIngressService is scoped to a tenant and namespace. If you wish to work in a different tenant or namespace, you would need another instance scoped to that tenant and namespace.
 
-## OMF Connections
-
-An OMF Connection is made up of three components: one or more Clients, a Topic, and a Subscription. Data is sent to a Topic via a Client, where the data is buffered and made available for the Subscription. The Subscription relays data from the Topic to the Sequential Data Store in the namespace that the Subscription resides in. The OmfIngressClient in this example creates a connection using an existing clientId, and creating a Topic and Subscription as detailed below.
-
 ## Clients
 
-Devices sending OMF messages each need a clientId and clientSecret. The clientId is used route messages to the proper topic(s). ClientIds may be mapped to at most one topic per namespace. For more details on Clients see the [Client Credential Client Documentation](https://ocs-docs.osisoft.com/Content_Portal/Documentation/Identity/Identity_ClientCredentialClient.html).
+Devices sending OMF messages each need a clientId and clientSecret. The clientId is used route messages to the proper connection(s). ClientIds may be mapped to at most one connection per namespace. For more details on Clients see the [Client Credential Client Documentation](https://ocs-docs.osisoft.com/Content_Portal/Documentation/Identity/Identity_ClientCredentialClient.html).
 
-## Topics
+## OMF Connections
 
-A Topic is used to aggregate data received from clients and make it available for consumption via a Subscription. A topic must contain at least one client Id. Client Ids may be added to or removed from an existing topic. First, we create the Topic locally by instantiating a new Topic object:
+ An OMF Connection is the connection that handles reading and handling OMF messages. We create the Connection by instantiating a new OmfConnectionCreate object:
 
 ```C#
-Topic topic = new Topic()
+OmfConnectionCreate omfConnectionCreate = new OmfConnectionCreate()
 {
-    Name = "REPLACE_WITH_TOPIC_NAME",
-    Description = "This is a sample Topic",
+    Name = "REPLACE_WITH_CONNECTION_NAME",
+    Description = "This is a sample Connection",
     ClientIds = new List<string>() { mappedClientId }
 };
 ```
 
-Then use the Ingress client to create the Topic in ADH:
+Then use the Ingress client to start the creation of the Client:
 
 ```C#
-Topic createdTopic = await omfIngressService.CreateTopicAsync(topic);
+OmfConnection omfConnection = await omfIngressService.BeginCreateOmfConnectionAsync(omfConnectionCreate).ConfigureAwait(false);
 ```
 
-## Subscriptions
-
-A Subscription is used to consume data from a Topic and relay it to the Sequential Data Store. First, we create the Subscription locally by instantiating a new Subscription object:
+After initiating creation, we can query for the connection and check the status until it is Active:
 
 ```C#
-Subscription subscription = new Subscription()
+using (CancellationTokenSource cancel = new CancellationTokenSource(_timeout))
 {
-    Name = "REPLACE_WITH_SUBSCRIPTION_NAME",
-    Description = "This is a sample ADH Data Store Subscription",
-    TopicId = createdTopic.Id,
-    TopicTenantId = "REPLACE_WITH_TOPIC_TENANT_ID",
-    TopicNamespaceId = "REPLACE_WITH_TOPIC_NAMESPACE_ID"
-};
+    while (!cancel.IsCancellationRequested && !omfConnection.State.Equals("Active"))
+    {
+        omfConnection = await _omfIngressService.GetOmfConnectionAsync(omfConnection.Id).ConfigureAwait(false);
+        Task.Delay(1000).Wait();
+    }
+
+    if (cancel.IsCancellationRequested)
+    {
+        throw new Exception("Omf Connection creation timeout");
+    }
+}
 ```
 
-Then use the Ingress client to create the Subscription in ADH:
-
-```C#
-Subscription createdSubscription = await omfIngressService.CreateSubscriptionAsync(subscription);
-```
+A cancellation token is used to ensure that the action never excedes the value _timeout.
 
 ## Send OMF Messages
 
@@ -131,14 +120,14 @@ DataPointType dataPoint = new DataPointType() { Timestamp = DateTime.UtcNow, Val
 OmfDataMessage dataMessage = OmfMessageCreator.CreateDataMessage(streamId, dataPoint);
 ```
 
-Then the devices uses its own ingress client, which uses the device clientId and clientSecret to authenticate the requests. The device clientId is used to route the message to the Topic that the clientId is mapped to. Note that the message must be serialized before being sent.
+Then the devices uses its own ingress client, which uses the device clientId and clientSecret to authenticate the requests. The device clientId is used to route the message to the Connection that the clientId is mapped to.
 
 ```C#
 var serializedMessage = OmfMessageSerializer.Serialize(omfMessage);
 await deviceOmfIngressService.SendOMFMessageAsync(serializedMessage);
 ```
 
-## Cleanup: Deleting Topics and Subscriptions
+## Cleanup: Deleting OMF Connections
 
 In order to prevent unused resources from being left behind, this sample performs some cleanup before exiting.
 
@@ -154,12 +143,47 @@ containerMessage.ActionType = ActionType.Delete;
 
 Then serialize the message and send as shown in the prior section.
 
-Deleting Subscriptions and Topics can be achieved using the Ingress client and passing the corresponding object Ids:
+Deleting an OMF Connection can be achieved using the Ingress client and passing the corresponding object Id:
 
 ```C#
-await omfIngressService.DeleteSubscriptionAsync(createdSubscription.Id);
-await omfIngressService.DeleteTopicAsync(createdTopic.Id);
+await _omfIngressService.BeginDeleteOmfConnectionAsync(omfConnection.Id).ConfigureAwait(false);
 ```
+
+After beginning the deletion, we can continuously check the list of OMF Connections until it no longer contains our omfConnection:
+
+```C#
+using (CancellationTokenSource cancel = new CancellationTokenSource(_timeout))
+{
+    bool deleted = false;
+    while (!deleted)
+    {
+        OmfConnections omfConnections = await _omfIngressService.GetOmfConnectionsAsync().ConfigureAwait(false);
+        bool found = false;
+        foreach (OmfConnection connection in omfConnections.Results)
+        {
+            if (string.Equals(connection.Id, omfConnection.Id, StringComparison.InvariantCultureIgnoreCase))
+            {
+                deleted = connection.State.Equals("Deleted");
+                found = true;
+            }
+        }
+
+        if (!found)
+        {
+            deleted = true;
+        }
+
+        Task.Delay(1000).Wait();
+    }
+
+    if (cancel.IsCancellationRequested)
+    {
+        throw new Exception("Omf Connection deletion timeout");
+    }
+}
+```
+
+A cancellation token is used to ensure that the action never excedes the value _timeout.
 
 ## Steps to run this sample
 
