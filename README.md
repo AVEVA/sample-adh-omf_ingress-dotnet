@@ -1,6 +1,6 @@
 # OMF Ingress .NET Samples
 
-**Version:** 1.2.4
+**Version:** 1.2.5
 
 [![Build Status](https://dev.azure.com/osieng/engineering/_apis/build/status/product-readiness/ADH/aveva.sample-adh-omf_ingress-dotnet?branchName=main)](https://dev.azure.com/osieng/engineering/_build/latest?definitionId=2620&branchName=main)
 

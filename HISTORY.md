@@ -1,5 +1,9 @@
 # Version History
 
+## 1.2.5 / 2023-10-13
+
+- Migrate Pipelines
+
 ## 1.2.4 / 2023-02-06
 
 - Update OmfIngressClient to use new Connections
