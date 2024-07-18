@@ -104,7 +104,7 @@ namespace OmfIngressClientLibraries
             OmfIngressService baseOmfIngressService = new (new Uri(Resource), HttpCompressionMethod.None, authenticationHandler);
             _omfIngressService = baseOmfIngressService.GetOmfIngressService(TenantId, NamespaceId);
 
-            Console.WriteLine($"ADH endpoint at {Resource}");
+            Console.WriteLine($"Cds endpoint at {Resource}");
             Console.WriteLine();            
         }
 

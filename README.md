@@ -6,7 +6,7 @@
 
 ## Scope of Sample
 
-This sample is intended to show how to build out the OMF Ingress connection in ADH programmatically using the DotNet NuGet library. The starting point of this sample assumes your OMF Ingress is not configured. It does show sending OMF data, but that is to show that the programmatic OMF configuration works. A typical OMF app would assume that the OMF ingress is already configured (as this is a one time configuration action). To learn about OMF application development and see samples of typcial OMF applications please go to our [OMF Repository](https://github.com/osisoft/OSI-Samples-OMF).
+This sample is intended to show how to build out the OMF Ingress connection in Cds programmatically using the DotNet NuGet library. The starting point of this sample assumes your OMF Ingress is not configured. It does show sending OMF data, but that is to show that the programmatic OMF configuration works. A typical OMF app would assume that the OMF ingress is already configured (as this is a one time configuration action). To learn about OMF application development and see samples of typcial OMF applications please go to our [OMF Repository](https://github.com/AVEVA/AVEVA-Samples-OMF).
 
 ## Building a Client with the Ingress Client Libraries
 
@@ -22,7 +22,7 @@ The libraries offer a framework of classes that make client development easier.
 
 The sample is configured using the file [appsettings.placeholder.json](OmfIngressClientLibraries/appsettings.placeholder.json). Before editing, rename this file to `appsettings.json`. This repository's `.gitignore` rules should prevent the file from ever being checked in to any fork or branch, to ensure credentials are not compromised.
 
-The OMF Ingress Service is secured by obtaining tokens from the Identity Server. Such clients provide a client application identifier and an associated secret (or key) that are authenticated against the server. The sample includes an `appsettings.json` configuration file to hold configuration strings, including the authentication strings. You must replace the placeholders with the authentication-related values you received from AVEVA. The application requires two Client Credential Clients, one to manage OMF Ingress connections and one to send data from a mock device. For information on how to obtain these client IDs and secrets, see the [Client Credential Client Documentation](https://ocs-docs.osisoft.com/Content_Portal/Documentation/Identity/Identity_ClientCredentialClient.html).
+The OMF Ingress Service is secured by obtaining tokens from the Identity Server. Such clients provide a client application identifier and an associated secret (or key) that are authenticated against the server. The sample includes an `appsettings.json` configuration file to hold configuration strings, including the authentication strings. You must replace the placeholders with the authentication-related values you received from AVEVA. The application requires two Client Credential Clients, one to manage OMF Ingress connections and one to send data from a mock device. For information on how to obtain these client IDs and secrets, see the [Client Credential Client Documentation](https://docs.aveva.com/bundle/data-hub/page/api-reference/identity/identity-client-credential-clients.html).
 
 ```json
 {
@@ -63,7 +63,7 @@ Note that the instance of the IOmfIngressService is scoped to a tenant and names
 
 ## Clients
 
-Devices sending OMF messages each need a clientId and clientSecret. The clientId is used route messages to the proper connection(s). ClientIds may be mapped to at most one connection per namespace. For more details on Clients see the [Client Credential Client Documentation](https://ocs-docs.osisoft.com/Content_Portal/Documentation/Identity/Identity_ClientCredentialClient.html).
+Devices sending OMF messages each need a clientId and clientSecret. The clientId is used route messages to the proper connection(s). ClientIds may be mapped to at most one connection per namespace. For more details on Clients see the [Client Credential Client Documentation](https://docs.aveva.com/bundle/data-hub/page/api-reference/identity/identity-client-credential-clients.html).
 
 ## OMF Connections
 
@@ -106,7 +106,7 @@ A cancellation token is used to ensure that the action never excedes the value _
 
 ## Send OMF Messages
 
-OMF messages sent to ADH are translated into objects native to the Sequential Data Store. In this example, we send an OMF Type message which creates an SDS type in the data store, an OMF Container message which creates an SDS stream, and then send OMF Data messages, which use the containerId in the message body to route the data to the SDS stream. Refer to the data store documentation for how to view the types/streams/data in SDS. For each type of message, we first construct the message body using the OMF library:
+OMF messages sent to Cds are translated into objects native to the Sequential Data Store. In this example, we send an OMF Type message which creates an SDS type in the data store, an OMF Container message which creates an SDS stream, and then send OMF Data messages, which use the containerId in the message body to route the data to the SDS stream. Refer to the data store documentation for how to view the types/streams/data in SDS. For each type of message, we first construct the message body using the OMF library:
 
 ```C#
 OmfTypeMessage typeMessage = OmfMessageCreator.CreateTypeMessage(typeof(DataPointType));
@@ -216,5 +216,5 @@ dotnet test
 
 ---
 
-For the main ADH page [ReadMe](https://github.com/osisoft/OSI-Samples-OCS)  
-For the main AVEVA samples page [ReadMe](https://github.com/osisoft/OSI-Samples)
+For the main Cds page [ReadMe](https://github.com/AVEVA/AVEVA-Samples-CloudOperations)  
+For the main AVEVA samples page [ReadMe](https://github.com/AVEVA/AVEVA-Samples)
